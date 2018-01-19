@@ -12,11 +12,9 @@ system.file()
   easy to install
   
 
-
 Installing and managing packages
 .libPaths(), R_LIBS/R_LIBS_USER, R_LIBS_SITE
 packrat
-
 
 [done] Packages
   loaded and attached.
