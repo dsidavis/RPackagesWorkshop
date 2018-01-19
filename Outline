@@ -119,19 +119,19 @@ Documentation
 
   License
 
-Configuration
+[done] Configuration
   example
 
 
-C/C++/FORTRAN code
+[done] C/C++/FORTRAN code
 
-Makevars
+[done] Makevars
 Configuration
   Makevars.in
   Makevars.win  
 
 
-Tests
+[done] Tests
   Shouldn't take too long to run
             depend on external sites
 	if they do, make certain to be able to
@@ -141,10 +141,10 @@ Tests
      sanity checks everything is working
      longer tests that
 
-Testing R Packages on Windows
+[done] Testing R Packages on Windows
  rwinbuilder
 
-Submitting to CRAN
+[done] Submitting to CRAN
     R CMD check -as-cran
  
 

@@ -2,5 +2,5 @@ Package: Cpackage
 Title: C
 Author: DTL
 Maintainer: DTL <duncan@r-project.org>
-License: BSD+LICENSE
+License: BSD_3_clause+file LICENSE
 Version: 0.1-0
