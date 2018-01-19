@@ -1,0 +1,5 @@
+# `pkg-config  --cflags lept tesseract`
+# `pkg-config  --libs lept tesseract`
+
+PKG_CPPFLAGS=@LEPT_CFLAGS@ @TESS_CFLAGS@
+PKG_LIBS=@LEPT_LIBS@ @TESS_LIBS@
