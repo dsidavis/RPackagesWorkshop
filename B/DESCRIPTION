@@ -1,0 +1,6 @@
+Package: Bpackage
+Title: B
+Author: DTL
+Maintainer: DTL <duncan@r-project.org>
+License: BSD+LICENSE
+Version: 0.1-0

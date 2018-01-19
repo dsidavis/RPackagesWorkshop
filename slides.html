@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Working with &amp; Creating R Packages</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Working with &amp; Creating R Packages
+
+
+## [https://github.com/dsidavis/RPackages](https://github.com/dsidavis/RPackages)
+
+### Duncan Temple Lang
+
+<div style="clear: both"/>
+
+<!-- <hr width="50%"/> -->
+<img src="http://dsi.ucdavis.edu/images/dsi_banner.png" height="40%"></img>
+
+---
+layout: true
+<img style="float: right" src="http://dsi.ucdavis.edu/images/dsi_brand_logo.png"></img>
+
+---
+
+# Goal
+
+<!--
+1. Working with packages.
+1. Learn to create an R package.
+1. DESCRIPTION file
+1. Documentation
+1. License
+1. Imports
+1.
+1. Making Some Functions Available (hiding others)
+    + NAMESPACE file
+1. Version control
+   + Strategies
+      + Tags
+      + Branches
+1. Hosting a Repository
+
+1. S3 & S4 classes
+   + Exporting methods
+   + Designing
+
+1. C/C++ code
+1. Configuration
+   + Makevars.in
+
+1. Installing Packages
+   + Installing a package from github with devtools.
+   + Libraries
+-->
+
+
+---
+# What is a package
+
++  an installable unit of R code and/or data
+    + a collection of functions
+    + data objects
++ documentation
++ easy to install &amp; share with others.
+
+---
+# Working with Packages
+
++ Basic installation
+
++ From within R
+```
+install.packages("package")
+install.packages("package", repos = NULL)
+install.packages("package.tar.gz", repos = NULL)
+```
++ From github via devtools
+```
+devtools::install_github("dsidavis/RMinPackage")
+```
+
++ Local packages from terminal command line
+```
+R CMD INSTALL package.tar.gz
+R CMD INSTALL packageDirectory
+```
+   +  Download the package via Web browser, git clone, your own package...
+
+---
+
+<!--
+  install.packages(  repos = )
+   -->
+
+---
+
+# Where is the Package Installed
+
++ Library versus package
+   + Library is a directory which contains one or more installed packages.
+
++ R has recommended packages in its own R directory
++ When you install a new package, typically don't have permissions to write there.
++ R will ask to create your own library directory.
+
++ You can create this ahead of time as any directory.
++ Specify your own collection of R library directories
+  + R_LIBS or R_LIBS_USER environment variable.
+  + Via .libPaths() R function.
+
++ Installing into personal "libraries"
++ Multiple libraries and versions of packages
++ Configuring a package for installation.
+
+
+----
+# Installing and Loading a Package
+
++ Installing a package is separate from loading it into an R session
++ install.packages("RMinPackage", repos = "http://dsi.ucdavis.edu/R", type = "source")
++ library()
+
+
+
+---
+# Packages - Loading and Attaching
+
++ Difference between loading a package and attaching to the search path
+
++ Loading: refer explicitly to a variable in a package, load another package that imports/depends on package
++ Attaching:  library() and require()
+
++ Load the package but don't attach it to the search path
+```
+  search()
+  XML::xmlParse 
+  search()
+
++ But attaching it changes the search path
+```
+  library(XML)
+  search()
+  xmlParse
+  XML::xmlParse
+```
+
+---
+# :: and ::: in R
+
++ What's the difference between :: and :::?
+
+
+---
+
+
+
+---
+# Writing Packages
+
+## Why write a package
+
++  If you want to install your code on multiple machines (e.g. laptop, desktop, compute server, cluster)
+    + e.g. to run parallel code on different machines
+    + easier with a package than loose collection of R files.
+
++ Easy to share code with others and yourself.
++ Creating a package is very easy and gives you a single unit (not loose files).
++ If you want help debugging your code, much easier to give somebody a package they can install and run
+  your example to get error.
+
++ Contributes to academic community
++ Promotes your ideas.
++ Get feedback on your ideas.
+
+---
+# Anatomy of a Package
+
++ Directory containing
+   + **DESCRIPTION** file
+   + **NAMESPACE** file
+   + **R** directory
+
++ Additional directories
+   + **man** - help files
+   + **tests** - tests to check the package
+   + **data** - data provided by the package
+   + **inst** - other files to be installed with the package
+
+
+
+---
+#  DESCRIPTION file
+## Fields
+
++ Package - name of package.
+    + One word/phrase - no spaces
++ Version - version number of for *major-minor.patch*
++ Title - short description of the package
++ Description - longer description of package
+    + put space at start of 2nd, 3rd, ... line
++ Author - name of authors, or can be an R expression creating author list object
++ Maintainer - name and email of one person responsible for answering questions
++ License - see below
++ Depends, Imports, Suggests - see below
++ Collate
+
+---
+
+# Version Number
+
++ Version numbers look like
+```
+major-minor.patch
+2-34.2
+```
++ patch - fix a bug, documentation, etc. but no new features/functionality
++ minor - new feature - e.g. new function, new parameter(s) for one or more functions, new example(s)
++ major - either
+   + cumulative critical mass of new functionality worthy of note
+   + change to functionality and/or API that is not backward compatible with previous version.
+
+
+---
+# R code
+
++ Put the R code in the R directory
+
++ Typically collection of functions
++ Code will be source()d at installation time
+   + Any expressions will be evaluated then, not when the package is loaded.
+   + See .onAttach()
+
++ Organize functions
+    + one per file
+    + related functions in one file
+    + all functions in one file.
+    + S4 class definitions in one file, generics in another, methods in other files. 
+---
+
+# NAMESPACE file
+
++ 2 purposes
+    + import packages or functions from other packages that this package uses
+    + export functions/variables for user to see (via `ls("package:MyPackage")`)
+
++ Exporting functions
+   + export()
+   + exportPattern()
+```
+# By regular expression
+exportPattern(".*")
+exportPattern("^[a-z].*")
+
+# or explicitly
+export(foo, bar)
+export(foobar)
+```
+
+---
+
+# Imports and Dependencies
+
++ It is good for one package to use functionality from another.
+   + Don't reinvent the wheel
+
+
+---
+# NAMESPACE and S3 and S4 methods
+
++ For S3 methods, e.g. `plot.matrix`, `[[.XMLAbstractNode`
+```
+S3method(plot, matrix)
+S3method("[[", XMLAbstractNode)
+```
+
++ For S4 methods
+   + export generic.  Often import it from other package, then export
+   + export each method
+```
+importFrom("graphics", "plot")
+importFrom("base", "[[")
+export("plot", "[[")
+exportMethods("plot", "[[")
+```
+
+---
+# Installing a Local Package
+
++ *Shell*:  `R CMD INSTALL path/to/directoryName`
++ *R*:  `install.packages("path/to/directoryName", repos = NULL)`
+
+
+
+---
+
+# License
+
+---
+# Action when Package is Loaded - `.onLoad()`, `.onUnload()`
+
++ For some packages, we may need to do something when it is first loaded, e.g.,
+  + create a temporary directory or an R environment object to cache data objects
+  + create an instance of  C/C++ level data structure
++ And when the package is implicitly unloaded (when no longer needed), clean up.
+
++ Define a function named
+```
+.onLoad = function(...)
+{
+
+}
+```
+and similarly `.onUnload()`.
+
++ R calls these when the package is loaded and unloaded.
+
++ These are different from .onAttach() and .onDetach().
+
+
+---
+# C/C++/FORTRAN code
+
++ A package can contain C/C++/FORTRAN code
++ Put these in the **src/** directory.
++ `R CMD INSTALL`/`install.packages()` will take care of compiling this code and creating a shared library (DLL/DSO)
+   with the name of the package.
++ We arrange for the package to load this DLL when the package is first used via useDynLib() in the NAMESPACE file.
+```
+useDynLib(RMinCompiledPackage)
+```
+  + Can register the native routines in the useDynLib() to precache them, limit what can be found, etc.
+
+
++ If the C/C++/FORTRAN compiler need specific options, put these in `src/Makevars`.
+```
+PKG_CPPFLAGS=-DENABLE_R=1
+```
+
+---
+
+# Compiled Code
+
++ R CMD INSTALL and install.packages() will compile .c/.cc/.cpp/.f files, build the DLL/DSO.
+
++ When developing the package, can be useful to compile files individually
+with 
+```
+R CMD COMPILE foo.c
+```
++ You can then fix errors and recompile.
+
+---
+# Controlling the Compilation
+## Example: RMinTesseract
+
++ For your own or another package, sometimes need to pass specific options
+to the compiler and linker
++ Some are
+    + specific to the package's code, (e.g., preprocess defines, -I for include directories)
+    + general for the compiler (e.g. -g for debugging)
+
++ Put general compilation flags in ~/.R/Makevars for use in compiling all packages.
++ Put package-specific in src/Makevars
+
+---
+
+# Configuring a Package
+## Example: RMinTesseractDynConf
+
++ Many packages are pure R code or contain self-contained C code.
++ However, some depend on system-specific executables or compiled libraries and header files.
++ Often, we have to find these at installation time, e.g. to compile and create the DLL/DSO.
++ Need to search the installation machine for its characteristics and where the relevant files are located.
++ On Linux/OSX, we typically use an autoconf script for this -
+   + **configure** script generated from **configure.in** or **configure.ac**
+
+---
+# Autoconf Configure
+
+## Example: RMinTesseractDynConf
+
++ Write configure.in (or configure.ac)
++ Generate configure shell script from configure.in using
+```
+autoconf
+```
+
++ R will see the configure file and run it before installing the package.
++ The configure script typically looks for files, attempts compilation, linking
++ Then writes out compiler options and other information
+   + AC_OUTPUT(src/Makevars)
+   + Replaces the values of specified variables in the script with @VARIABLE_NAME@ in files named, e.g., src/Makevars.in
+
++ Can substitute content into .R files
+```
+AC_OUTPUT(R/data.R)
+```
+   for R/data.R.in   
+
+
+---
+# Testing a Package
+
++ Check R CMD INSTALL works
++ Then, build as tar.gz file then check from that.
++ `R CMD build path/to/package`
++ Then use `R CMD check`
++ `R CMD check package_&lt;ersion&gt;.tar.gz`
+
++ You can R CMD check path/to/package but not as good a test
+    + Left over files in the directory.
+
+---
+# Automated Testing On Git Commit
+
++ When commit a change to the package git repository, immediately run R CMD check.
+
++ Can use Travis CI - Continuous Integration
+
++ [https://docs.travis-ci.com/user/languages/r/](https://docs.travis-ci.com/user/languages/r/)
+
+---
+# Package Builds and Ignoring Files
+
++ We often have extraneous files in our package that are not intended to be shipped
+   + .git, .svn, backup files, log files, .tar.gz files, .....
++ We exclude these when we **build** the archive for the package
+   + Specify patterns to ignore via .Rbuildignore
+
++ These patterns are regular expressions (PCRE)
+
+   
+---
+
+# Shipping a Package
+
++ Available via github.com and devtools::install_github()
++ As source tar ball
+```
+R CMD build path/to/package
+```
+  gives, e.g., package_0.3-0.tar.gz
+
+
+---
+# Submitting to CRAN
+
++ Run
+```
+R CMD build myPackage
+R CMD check --as-cran myPackage_&lt;version&gt;.tar.gz 
+```
+
++ You must remove all Errors, Warnings
++ Address all NOTEs
+
++ Repet this on as many different machines and operating systems as possible.
+  + Linux and different distributions
+  + OS X
+  + Windows (10, ...).
+
+---
+
+# Git and Package Releases
+
++ When you release a version, good to put a tag on the git repository corresponding to the commit for that release.
+
++ When dealing with bug/issue reports, can then checkout that tag.
+
+
+
++ When developing new features, good to be on a branch.
+   + Allows users to install stable version directly from github.
+   + When branch is stable, merge into default master branch.
+   + Users can still install from any development branch for experimental features.
+
+
+---
+# Your Own Repository
+
++ Putting a package on CRAN means binary builds for most platforms.
+
++ However, can be useful to provide your own repository
+   + source version
+   + binary for different operating systems.
+
++ On Web site, create
+   + src/contrib
+   + bin/macosx/contrib and/or bin/windows/contrib
+
++ Put source .tar.gz files for packages in src/contrib (from `R CMD build`)
+
++ In src/contrib, build PACKAGES index file for packages
+```
+tools:::write_PACKAGES()
+```
+
++ R Users can then, for example, 
+```
+available.packages(repos = "http://dsi.ucdavis.edu/R", type = "source")
+```
+   + We put these under the R/ directory within the top-level directory of the DSI web site.
+   + So URL is http://dsi.ucdavis.edu/R
+
++ Put binaries in directories bin/macosx/contrib/  identified by version number, e.g, 3.4, 3.3, 3.5
+  + e.g.  `bin/macosx/contrib/3.5`
+
++ Build PACKAGES file in that directory.
+
++
+```
+p = available.packages(repos = "http://dsi.ucdavis.edu/R", type = "mac.binary")
+```
+
+
+---
+# R Code in Packages
+
++ When writing a package for your own use, anything goes.
+
++ For others to use, you need 
+   + the code to be robust to different inputs
+       + check class/type of inputs, lengths, NAs, 
+   + to provide meaningful error messages
+   + to provide good documentation, examples and vignettes
+   + answer questions promptly
+   + avoid reimplementing functions in existing packages.
+
++ Make the functions flexible
+   + add parameters to allow the caller to specify values you compute within the function.
+   + customize computations with parameters and functions
+
++ Make extensible
+   + Use classes and methods
+   + Allow the user to define their own sub-classes and methods and to provide objects from these classes.
+
++ Anticipate different uses.
+
+---
+
+# Un-seminar
+
++ February 6th,  DSI Class room (here)
+
++ Discussion about challenges of
+finding functionality because of so many R packages that provide similar
+functionality.
+
++ This should be a very interesting discussion.
+
+---
+# Resources
+
+1. R Packages book, Hadley Wickham
+1. Writing R Extensions manual, R core.
+
+---
+
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>

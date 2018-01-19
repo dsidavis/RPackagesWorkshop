@@ -1,0 +1,161 @@
+R comes with built-in packages.
+These are the recommended packages. These are typically
+installed with R itself.
+
+If we start R with the --vanilla option (and ensure R_LIBS) is not
+set, R will just look in its own directory for the recommended packages:
+```
+.libPaths()
+[1] "/Users/duncan/Projects/R/R-tmp/build2/library"
+```
+
+.libPaths() is the function that tells us the directories
+
+We typically want to install additional packages.
+You can have your system administrator install them
+centrally within the R directory.  The sys. admin may be
+you and you can install into that directory if you have the appropriate
+permissions.
+
+
+We can add one or more other directories to where R searches for packages
+or into which R will install packages.
+Just as we use .libPaths() to find where R searches for packages,
+we use  .libPaths() to set the vector of directories to search for packages.
+```
+.libPaths( c("~/Rpackages", .libPaths()) )
+```
+
+We first need to ensure ~/Rpackages exists.
+We can do this with
+```
+if(!file.exists("~/Rpackages"))
+  dir.create("~/Rpackages")
+```
+
+We can put all of this into the file ~/.Rprofile
+which is run each time R starts (unless we start R
+with R --vanilla).
+
+
+An alternative to setting .libPaths() (at the prompt or in ~/.Rprofile or
+elsewhere) is to set the shell environment variable
+R_LIBS or R_LIBS_USER.  The value of this can be a single directory or a colon-separated
+collection of directories.
+
+
+## The Difference between Library and Package
+The library() function in R is unfortunately misnamed.
+A library is a directory containing one or more installed packages.
+A package is a collection of functions, data, etc.
+We load a package into the R environment and put it on the
+search  path using the library() function or the require() function.
+
+
+## Where Packages are Installed
+
+Generally, the first element of .libPaths() is used as the library
+
+
+
+It is always a good idea to 
+
+On a stand-alone machine, it makes sense to 
+
+## 
+
+
+
+
+## Installing Packages
+
+The install.packages() function is
+RStudio allows you to interactively point-and-click to install packages
+via a GUI (Graphical User Interface).
+It uses install.packages() and other related functions built-in to R.
+It can be helpful to use these directly, e.g., to make code programmatic and hence reproducible.
+
+
+We often get packages from a repository.
+We can specify this via the repos parameter in install.packages().
+
+Packages from a repository come as binary versions or source versions.
+Binary versions are available for OSX/Mac, Windows. For Linux, we typically build
+from source.  You can specify whether you want the source version with
+```
+install.packages(type = "source")
+```
+
+
+
+
+
+We can install a local package from the shell command line using R CMD INSTALL:
+```
+R CMD INSTALL myPackageDirectory
+R CMD INSTALL package.tar.gz # source of package
+R CMD INSTALL package.tgz    # binary version of package
+```
+
+We'll use the R CMD invocation mechanism later for checking a package is complete
+(and is compatible with being on CRAN), and it is good to know about it as R CMD
+provides several other useful facilities.
+
+We can also use the devtools package to install a package from a local directory,
+a github repository, etc.
+Note that the devtools' functions mimic aspects of what R CMD INSTALL and install.packages()
+but are not exactly the same.  For some more complex/less common features in packages (e.g. S4
+classes and methods, registration), devtools may not do exactly the same thing as R CMD INSTALL
+and install.packages() and so when using it in development and then to test code,
+one really wants to verify the code with R CMD INSTALL and R CMD check.
+
+
+When developing a package, we often change the code and want to reload the package
+in  the same R session.  This is somewhat complicated.
+The package is on  the search path (or even more
+complex may be simply loaded and not attached to the search path).
+If it has a compiled DLL/DSO (shared library), that has also been loaded.
+
+Basically, if you want to reload the package, make certain to unload it first.
+(??) devtools::load_all() will attempt to reload the code for a package (and in the correct
+order). But be careful. It is possible to end up still using the old version of R or compiled code
+that was not unloaded. As a result, your new changes may not be in effect.
+So it is good to quit R and restart a fresh new session.
+
+You can't really assign an updated version of a function back into package's namespace.
+
+
+
+
+# How Packages Work
+
+All packages have a namespace.
+The idea of the namespace is that the package has its own search() path
+along which it finds variables/symbols.
+
+A package imorts
+
+### Difference between Depends and Imports
+When a package A *Depends* on another package B, that package B is automatically
+loaded into the user's search path when package A is loaded.
+That means that A's variables may be found and used anytime the user refers to a symbol.
+This may cause variable conflicts and end up with the user getting the wrong value,
+and hopefully an error, but worse, possible the wrong answer!
+For this reason, we try to avoid explicit dependencies (via Depends in the DESCRIPTION
+file or calls to library or require) for a package.
+
+A better way to do this is for a package A to Import some or all of the variables
+in package B. What this does is 1) not put B on the search path,
+2) keep the variables in package B separate from
+those in A, 3) arrange for functions in A to look in B (and all the packages it
+imports) when resolving variables.
+
+
+
+
+
+
+
+
+
+

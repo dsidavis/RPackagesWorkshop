@@ -1,0 +1,6 @@
+foo =
+function()
+{
+  "B"
+}
+
