@@ -1,0 +1,7 @@
+Package: RMinPackage
+Title: A minimal R Package
+Author: Duncan Temple Lang
+Maintainer: Duncan Temple Lang <duncan@r-project.org>
+License: BSD_3_clause+LICENSE
+Version: 0.1-0
+

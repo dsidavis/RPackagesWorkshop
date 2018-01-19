@@ -1,0 +1,19 @@
+
+Creating a package is quite straightforward.
+RStudio, the kitten package and the function package.skeleton()
+provide convenience facilities to create them.
+These are easy to use. We'll focus on what it does and
+the actual structure and anatomy of an R package.
+There are three reasons for this: 1) when things go wrong,
+you can reason about what they are, 2)
+if you want to do something that the point-and-click interface
+doesn't support, you have to do things manually anyway and then interact
+with the actual package structure, 3) you still have to fill in the files
+that are generated for you, so you have to know the basic structure and purpose
+of the files.
+
+Sometimes we start with one or more R files and want to create a package.
+Othertimes we'll start with nothing created and decide  to create a package.
+And sometimes we'll create a new package and move existing code into it.
+
+First off, use version control (git, mercurial/hg, subversion, etc.) when creating a package.

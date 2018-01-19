@@ -1,0 +1,6 @@
+Package: RMinCompiledPackage
+Title: A minimal package containing C code that needs to be compiled.
+Author: DTL
+Maintainer: DTL <duncan@r-project.org>
+License: BSD+LICENSE
+Version: 0.1-0

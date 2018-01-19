@@ -1,0 +1,164 @@
+Difference between binary  and source package and binaries for different OSes.
+system.file()
+[done] .onAttach()
+
+[done] configure example
+
+[done] What is a package
+  an installable unit of R code and/or data
+     a collection of functions
+     data objects
+  documentation
+  easy to install
+  
+
+
+Installing and managing packages
+.libPaths(), R_LIBS/R_LIBS_USER, R_LIBS_SITE
+packrat
+
+
+[done] Packages
+  loaded and attached.
+
+  search()
+  XML::xmlParse - loads XML package but does not attach.
+  search()
+  library(XML)
+  search()
+  xmlParse
+  XML::xmlParse
+
+
+
+[done] How to get objects that are not exported from a package
+    :::  rather than ::
+  e.g.
+    XML:::trim()
+
+
+Installation
+
+ Can install from CRAN, other repository, local tar-ball, or package directory.
+
+ Set a repository
+    options(repos = "")
+
+ Some packages need configuration options
+   Use
+      R CMD INSTALL --configure-args="...." package.tar.gz
+
+ cleanup to clear auto-generated files during installation..
+    Good idea if you are changing the compilation or other states between different installation.
+
+ Sometimes want to have different versions of the same package installed simultaneously.
+ Not possible to have both loaded/attached in 
+
+Customizing Compilation of C/C++/FORTRAN code
+ ~/.R directory
+   Makevars file.
+   ~/.Renviron
+
+  ~/.R/config - for building R.
+
+
+
+
+
+Writing an R package
+ [done] Structure of a package
+[done] DESCRIPTION file and fields
+[done] NAMESPACE
+    exportPattern(".*")
+
+[done]  S3 and S4 methods.
+    import the generic.
+
+[done] Version numbers
+    major-minor.patch
+    0-1.0
+
+    patch - when we fix an existing function/feature
+    minor - when we add a parameter or a feature to an existing function, or maybe one or more functions
+    major - when there is significant change, either with a critical mass of additional functionality
+      since the previous major release, or
+        break the API, e.g. function names, parameters/parameter order so that previous code may not work.
+
+
+ R/
+
+   Typically functions.
+   In one or more files - arrange as you want.
+      Good ideas -
+          each function in its own file - name of file is name of function.
+          all functions related to each other in one file.
+	  all functions in one file!
+
+      No subdirectories
+      Name the files  .R, .r, .q, .s
+
+ Import, Depends
+    version numbers.
+
+ Collate: files if order is important.
+    Can rely on alphabetical order of files, but  not same in all locales.
+
+
+Documentation
+  man/ pages
+  prompt() function
+
+  remove the % inside the {}
+  Ensure title filled in - not left empty.
+
+  Examples
+  keyword
+  concept
+
+  roxygen2
+
+  longer documentation - vignettes.
+
+  License
+
+Configuration
+  example
+
+
+C/C++/FORTRAN code
+
+Makevars
+Configuration
+  Makevars.in
+  Makevars.win  
+
+
+Tests
+  Shouldn't take too long to run
+            depend on external sites
+	if they do, make certain to be able to
+	   ignore those tests
+	   defensively recover when the error is not related to the package (e.g. external site down)
+   2 levels of tests
+     sanity checks everything is working
+     longer tests that
+
+Testing R Packages on Windows
+ rwinbuilder
+
+Submitting to CRAN
+    R CMD check -as-cran
+ 
+
+[done] Git and packages
+  use tags
+  branches
+
+
+[done] Distributing Packages
+  Your own repository
+
+
+
+[done] travis
+  
