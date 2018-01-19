@@ -1,0 +1,2 @@
+useDynLib(RMinTesseract)
+export(tesseractVersion)

@@ -1,0 +1,5 @@
+# `pkg-config  --cflags lept tesseract`
+# `pkg-config  --libs lept tesseract`
+
+PKG_CPPFLAGS= -I/Users/duncan/local/include/leptonica  -I/usr/local/include -I/usr/local/include/tesseract
+PKG_LIBS=-L/Users/duncan/local/lib -L/usr/local/lib -llept -ltesseract 
