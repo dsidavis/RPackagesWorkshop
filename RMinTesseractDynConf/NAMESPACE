@@ -1,2 +1,2 @@
-useDynLib(RMinTesseract)
+useDynLib(RMinTesseractDynConf)
 export(tesseractVersion)

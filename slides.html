@@ -24,7 +24,7 @@ class: center, middle
 # Working with &amp; Creating R Packages
 
 
-## [https://github.com/dsidavis/RPackages](https://github.com/dsidavis/RPackages)
+## [https://github.com/dsidavis/RPackagesWorkshop](https://github.com/dsidavis/RPackagesWorkshop)
 
 ### Duncan Temple Lang
 
@@ -307,6 +307,65 @@ exportMethods("plot", "[[")
 + *R*:  `install.packages("path/to/directoryName", repos = NULL)`
 
 
+---
+# Documentation
+
++ You don't need documentation to install and "use" a package.
+  +  Need it to understand the functions!
+
++ 2 types of documents
+   + reference/help pages
+   + vignettes
+
++ Documentation for
+   + functions,
+   + data objects
+   + data sets (in data/ directory)
+   + methods and classes
+
++ 2 main approaches to creating documentation
+   + explicitly write the .Rd files in the man/ directory
+   + [roxygen2] put documentatation fragments beside code
+     and dynamically generate
+
++
+
+---
+
+# prompt() function
+
++ Generate Rd template with usage, parameters, etc.
+   + prompt(functionName) - not quotes
+   + prompt(dataObject)
+
++ Then move to man/ directory and edit
+
++ Can document multiple objects in same Rd file.
+   + Add \alias{otherObject}
+   + Add signature to usage section.
+
++ Ensure title filled in - not left empty.
++ Document Description, parameters
++ Do add code to examples
+   + Add if statements if conditionally run
+   + And \dontrun{....} for code you don't want to run but just show.
+
+---
+
+# Keywords &amp; Concepts
+
++ See doc/KEYWORDS in R installation.
+
++ Add free-form words/phrases via \concept{}.
+
+---
+
+# Markup Elements
++ Rd files are LaTeX like.
++ Understands some markup
+   + \url{}
+   + \code{}
+   + \link{\code{}} to another man page.
 
 ---
 
@@ -376,8 +435,8 @@ to the compiler and linker
     + specific to the package's code, (e.g., preprocess defines, -I for include directories)
     + general for the compiler (e.g. -g for debugging)
 
-+ Put general compilation flags in ~/.R/Makevars for use in compiling all packages.
-+ Put package-specific in src/Makevars
++ Put general compilation flags in `~/.R/Makevars` for use in compiling all packages.
++ Put package-specific in `src/Makevars`
 
 ---
 
@@ -414,9 +473,18 @@ AC_OUTPUT(R/data.R)
 ```
    for R/data.R.in   
 
+---
+# Windows and Configuration
+
++ A configure script may work on Windows
++ However, often we write it separately
++ And we create a Makevars.win file rather than Makevars.in
++ If Makevars.win exists when R builds the DLL, it will use that for compiling and linking the C/C++/FORTRAN code.
+
 
 ---
-# Testing a Package
+# Testing a Package Structure
+## Basics - will it install, is there documentation, etc.
 
 + Check R CMD INSTALL works
 + Then, build as tar.gz file then check from that.
@@ -428,6 +496,27 @@ AC_OUTPUT(R/data.R)
     + Left over files in the directory.
 
 ---
+# Testing the Functionality
+
++ Beyond testing structure, we test the functionality of the package's code
++ R CMD check will run
+   + code in examples in documentation (except in \dontrun{})
+   + code in each file in tests/ directory.
+
++ tests/ directory
+   + Each file should load the package (library(packageName))
+   + Tests shouldn't
+      + take too long to run
+      + depend on external sites
+	 + if they do, make certain to be able to
+	    + ignore those tests
+	    + defensively recover when the error is not related to the package (e.g. external site down)
+   + 2 levels of tests
+     + sanity unit tests that confirm everything is working
+     + longer tests that exercise functionality  as it would be called
+       by users. e.g. check correct answers for real problems.
+
+---
 # Automated Testing On Git Commit
 
 + When commit a change to the package git repository, immediately run R CMD check.
@@ -435,6 +524,18 @@ AC_OUTPUT(R/data.R)
 + Can use Travis CI - Continuous Integration
 
 + [https://docs.travis-ci.com/user/languages/r/](https://docs.travis-ci.com/user/languages/r/)
+
+
+---
+# Testing on Windows
+
++ Good idea to setup a Windows environment and test package there.
+   +  Use a virtual machine
+
++ Can submit a package to WinBuilder to have it attempt to build and test
+  on Windows and report results, errors, warnings, etc.
+
++ https://win-builder.R-project.org/
 
 ---
 # Package Builds and Ignoring Files
@@ -495,7 +596,8 @@ R CMD check --as-cran myPackage_&lt;version&gt;.tar.gz
 ---
 # Your Own Repository
 
-+ Putting a package on CRAN means binary builds for most platforms.
++ Putting a package on CRAN means CRAN will build binary versions
+  for most platforms.
 
 + However, can be useful to provide your own repository
    + source version
@@ -507,9 +609,14 @@ R CMD check --as-cran myPackage_&lt;version&gt;.tar.gz
 
 + Put source .tar.gz files for packages in src/contrib (from `R CMD build`)
 
-+ In src/contrib, build PACKAGES index file for packages
++ In src/contrib, build PACKAGES index file for packages with R command
 ```
 tools:::write_PACKAGES()
+```
+
++ Do this from terminal, makefile or shell script as
+```
+Rscript -e 'tools:::write_PACKAGES()'
 ```
 
 + R Users can then, for example, 
@@ -524,7 +631,7 @@ available.packages(repos = "http://dsi.ucdavis.edu/R", type = "source")
 
 + Build PACKAGES file in that directory.
 
-+
++ Check the results:
 ```
 p = available.packages(repos = "http://dsi.ucdavis.edu/R", type = "mac.binary")
 ```
